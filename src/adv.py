@@ -1,3 +1,5 @@
+# Add a REPL parser to `adv.py` that accepts directional commands to move the player
+
 from room import Room
 
 # Declare all the rooms
