@@ -1,5 +1,5 @@
 # Add a REPL parser to `adv.py` that accepts directional commands to move the player
-
+from item import Item
 from room import Room
 from player import Player
 
@@ -31,6 +31,11 @@ room['narrow'].w_to = room['foyer']
 room['narrow'].n_to = room['treasure']
 room['treasure'].s_to = room['narrow']
 
+# Add items to rooms
+room['foyer'].room_items.append('a rusty iron key')
+room['narrow'].room_items.append('a small, dim lamp')
+room['treasure'].room_items.append('an empty chest')
+
 # Cardinal directions
 directions = ['n', 's', 'e', 'w']
 
@@ -40,44 +45,53 @@ player = Player('Player1', room['outside'])
 # Write a loop that:
 while True:
     # Prints the current room name
-    print(player.room)
+    print(player.current_room)
     # Prints the current description (the textwrap module might be useful here).
-    print(player.room.description)
+    print(player.current_room.description)
     
     # Waits for user input and decides what to do.
-    user_input = input('Which direction do you want to go:\n (n), (s), (e), or (w)?\n Or press (q) to quit.')
+    user_input = input('Which direction do you want to go:\n (n), (s), (e), or (w)?\nHint: You can [l]ook around and [p]ickup any items that might be useful. Or press (q) to quit.')
+    
+    def invalid_input_message():
+        print(f'Sorry. You cannot do that.\n{user_input}')
 
     # If the user enters a cardinal direction, attempt to move to the room there.
     if user_input == 'n':
-        if hasattr(player.room, 'n_to'):
+        if hasattr(player.current_room, 'n_to'):
             print('Move North.')
-            player.room = player.room.n_to
+            player.current_room = player.current_room.n_to
         else:
             # Print an error message if the movement isn't allowed.
-            print('You cannot go that way. Please try again.\n Which direction do you want to go:\n (n), (s), (e), or (w)?\n Or press (q) to quit.')
+            invalid_input_message()
     elif user_input == 's':
-        if hasattr(player.room, 's_to'):
+        if hasattr(player.current_room, 's_to'):
             print('Move South.')
-            player.room = player.room.s_to
+            player.current_room = player.current_room.s_to
         else:
-            print('You cannot go that way. Please try again.\n Which direction do you want to go:\n (n), (s), (e), or (w)?\n Or press (q) to quit.')
+            invalid_input_message()
     elif user_input == 'e':
-        if hasattr(player.room, 'e_to'):
+        if hasattr(player.current_room, 'e_to'):
             print('Move East.')
-            player.room = player.room.e_to
+            player.current_room = player.current_room.e_to
         else:
-            print('You cannot go that way. Please try again.\n Which direction do you want to go:\n (n), (s), (e), or (w)?\n Or press (q) to quit.')
+            invalid_input_message()
     elif user_input == 'w':
-        if hasattr(player.room, 'w_to'):
+        if hasattr(player.current_room, 'w_to'):
             print('Move West.')
-            player.room = player.room.w_to
-        else:
-            print('You cannot go that way. Please try again.\n Which direction do you want to go:\n (n), (s), (e), or (w)?\n Or press (q) to quit.')
+            player.current_room = player.current_room.w_to
     # If the user enters "q", quit the game.
     elif user_input == 'q':
         print('Good-bye.')
         quit()
-
+    elif user_input == 'p':
+        player.current_room.pickup_item()
+        print(
+            f'You picked up {player.room.item} and added it to your inventory.')
+        player.current_room.remove_item()
+    elif user_input == 'l':
+        print(f'{player.current_room.room_items}')
+    else:
+        invalid_input_message()
 """
 hasattr() method
     Syntax : hasattr(obj, key)
